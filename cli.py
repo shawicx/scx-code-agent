@@ -70,16 +70,17 @@ def audit(all, diff, path, output, format, pr_comment):
     report = result.get("final_report", "# 无审查结果")
 
     # 输出报告
-    if output:
-        output_file = Path(output)
+    output_path = output or config.output.default_path
+    if output_path:
+        output_file = Path(output_path)
         output_file.parent.mkdir(parents=True, exist_ok=True)
         output_file.write_text(report, encoding="utf-8")
-        console.print(f"[green]报告已写入: {output}[/green]")
+        console.print(f"[green]报告已写入: {output_path}[/green]")
+
+    if format == "json":
+        console.print(report)
     else:
-        if format == "json":
-            console.print(report)
-        else:
-            console.print(Markdown(report))
+        console.print(Markdown(report))
 
     # PR 评论
     if pr_comment:
