@@ -1,0 +1,10 @@
+[
+  {
+    "file_path": "performance.py",
+    "line_number": 4,
+    "category": "Performance",
+    "level": "Warning",
+    "description": "Nested loop with unnecessary iterations causes O(n*m) complexity",
+    "suggestion": "def optimized(items):\n    return [item * i for item in items for i in range(100)]"
+  }
+]

@@ -1,0 +1,90 @@
+[tool.poetry]
+name = "scx-code-agent"
+version = "0.1.0"
+description = "Multi-agent code review system using LangGraph"
+authors = ["scx"]
+readme = "README.md"
+packages = [
+    {include = "agent"},
+    {include = "config.py"},
+    {include = "cli.py"},
+]
+
+[tool.poetry.dependencies]
+python = "^3.11"
+langgraph = "^0.2.0"
+langchain-core = "^0.3.0"
+langchain-openai = "^0.2.0"
+typer = {extras = ["rich"], version = "^0.12.0"}
+gitpython = "^3.1.43"
+requests = "^2.31.0"
+pydantic = "^2.0.0"
+python-dotenv = "^1.0.0"
+langchain-anthropic = "^0.3.0"
+PyYAML = "^6.0"
+tenacity = "^8.0.0"
+PyGithub = "^1.59"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.0.0"
+pytest-mock = "^3.14.0"
+black = "^24.0.0"
+ruff = "^0.6.0"
+mypy = "^2.1.0"
+pytest-cov = "^7.1.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+code-agent = "cli:audit"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 120
+
+exclude = [
+    ".venv",
+    "dist",
+    "build",
+    ".git",
+    "__pycache__",
+    ".pytest_cache",
+]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["agent", "config", "cli", "llm_client", "formatter", "git_utils", "github_client"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_missing_imports = true
+exclude = [".venv/", "dist/", "build/"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v"
+
+[tool.coverage.run]
+source = ["."]
+omit = [
+    ".venv/*",
+    "tests/*",
+    "prompts/*",
+    "*/__pycache__/*",
+]
+
+[tool.coverage.report]
+fail_under = 80
+show_missing = true
+exclude_lines = [
+    "pragma: no cover",
+    "if __name__ == .__main__.:",
+    "pass",
+]

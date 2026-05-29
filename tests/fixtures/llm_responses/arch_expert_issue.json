@@ -1,0 +1,10 @@
+[
+  {
+    "file_path": "test.py",
+    "line_number": 1,
+    "category": "Architecture",
+    "level": "Warning",
+    "description": "Function lacks type hints and docstring",
+    "suggestion": "def foo() -> None:\n    \"\"\"Placeholder function.\"\"\"\n    pass"
+  }
+]

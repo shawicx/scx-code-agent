@@ -1,0 +1,10 @@
+[
+  {
+    "file_path": "security.py",
+    "line_number": 2,
+    "category": "Security",
+    "level": "Blocker",
+    "description": "SQL injection vulnerability: user input directly interpolated into SQL query",
+    "suggestion": "def query(user_input):\n    cursor.execute('SELECT * FROM users WHERE id=%s', (user_input,))\n    return cursor.fetchall()"
+  }
+]
