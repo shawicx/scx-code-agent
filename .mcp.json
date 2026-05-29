@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "scx-code-agent": {
+      "command": "/Users/scx/Documents/code/scx-code-agent/.venv/bin/mcp-server"
+    }
+  }
+}

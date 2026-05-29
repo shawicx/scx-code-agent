@@ -32,22 +32,22 @@ StateGraph 单层并行模式：
 poetry install
 
 # 全量审查
-code-agent --all
+scx-code-agent --all
 
 # 增量审查（对比分支）
-code-agent --diff origin/main
+scx-code-agent --diff origin/main
 
 # 指定路径
-code-agent --path src/
+scx-code-agent --path src/
 
 # 输出到文件
-code-agent --all -o report.md
+scx-code-agent --all -o report.md
 
 # JSON 格式
-code-agent --all -f json
+scx-code-agent --all -f json
 
 # 发表 PR 评论
-code-agent --diff origin/main --pr-comment
+scx-code-agent --diff origin/main --pr-comment
 ```
 
 ## 环境变量

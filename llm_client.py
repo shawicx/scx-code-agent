@@ -445,7 +445,7 @@ def load_prompt(prompt_name: str) -> str:
     if "/" in prompt_name or "\\" in prompt_name or ".." in prompt_name:
         raise ValueError(f"Invalid prompt name: {prompt_name}")
 
-    prompt_path = Path("prompts") / prompt_name
+    prompt_path = Path(__file__).parent / "prompts" / prompt_name
     try:
         with open(prompt_path, "r", encoding="utf-8") as f:
             return f.read()

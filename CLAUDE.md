@@ -42,6 +42,6 @@ coordinator → [sec_expert, arch_expert, perf_expert] (parallel) → reporter �
 - **No conditional edges or router** — static DAG topology
 - **State accumulation** — `raw_comments` uses `Annotated[List[AgentIssue], operator.add]` so parallel expert results merge automatically
 - **Cost model:** LLM calls = files × 3 experts, peak parallelism = 15 (3 nodes × 5 threads each)
-- **Provider support:** anthropic/openai/deepseek/glm via `LLM_PROVIDER` env var or `.code-agent.yaml`
+- **Provider support:** anthropic/openai/deepseek/glm via `LLM_PROVIDER` env var or `.scx-code-agent.yaml`
 - **Prompt system:** `system_message = base.md + role_prompt`, LLM output parsed as JSON with `_repair_json()` fallback
-- **Config priority:** file (`.code-agent.yaml`) → env vars → defaults, supports `${VAR}` substitution
+- **Config priority:** file (`.scx-code-agent.yaml`) → env vars → defaults, supports `${VAR}` substitution

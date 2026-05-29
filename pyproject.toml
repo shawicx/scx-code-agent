@@ -8,6 +8,12 @@ packages = [
     {include = "agent"},
     {include = "config.py"},
     {include = "cli.py"},
+    {include = "mcp_server.py"},
+    {include = "llm_client.py"},
+    {include = "formatter.py"},
+    {include = "git_utils.py"},
+    {include = "github_client.py"},
+    {include = "prompts"},
 ]
 
 [tool.poetry.dependencies]
@@ -24,6 +30,7 @@ langchain-anthropic = "^0.3.0"
 PyYAML = "^6.0"
 tenacity = "^8.0.0"
 PyGithub = "^1.59"
+fastmcp = "^2.0"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
@@ -38,7 +45,8 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.scripts]
-code-agent = "cli:audit"
+scx-code-agent = "cli:audit"
+mcp-server = "mcp_server:main"
 
 [tool.ruff]
 target-version = "py311"

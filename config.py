@@ -55,10 +55,10 @@ def _substitute_env(value: Any) -> Any:
 def find_config_file() -> Optional[Path]:
     """Find configuration file in current directory."""
     candidates = [
-        Path(".code-agent.yaml"),
-        Path("code-agent.yaml"),
-        Path(".code-agent.yml"),
-        Path("code-agent.yml"),
+        Path(".scx-code-agent.yaml"),
+        Path("scx-code-agent.yaml"),
+        Path(".scx-code-agent.yml"),
+        Path("scx-code-agent.yml"),
     ]
     for candidate in candidates:
         if candidate.exists():

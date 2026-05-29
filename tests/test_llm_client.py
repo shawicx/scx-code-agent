@@ -689,19 +689,13 @@ class TestIsRetryableError:
 class TestLoadPrompt:
     """Test load_prompt function."""
 
-    def test_loads_existing_prompt(self, tmp_path, monkeypatch):
+    def test_loads_existing_prompt(self):
         """Loads a prompt file from the prompts directory."""
-        prompts_dir = tmp_path / "prompts"
-        prompts_dir.mkdir()
-        (prompts_dir / "test.md").write_text("Hello prompt", encoding="utf-8")
-
-        monkeypatch.chdir(tmp_path)
-        # Clear cache
         from llm_client import load_prompt
 
         load_prompt.cache_clear()
-        result = load_prompt("test.md")
-        assert result == "Hello prompt"
+        result = load_prompt("security.md")
+        assert len(result) > 0
         load_prompt.cache_clear()
 
     def test_missing_prompt_returns_empty(self, tmp_path, monkeypatch):

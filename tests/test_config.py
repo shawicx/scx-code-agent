@@ -33,14 +33,14 @@ class TestConfigLoading:
 
     def test_find_config_file_priorities(self, tmp_path, monkeypatch):
         """配置文件查找优先级"""
-        (tmp_path / ".code-agent.yaml").write_text("test: true")
+        (tmp_path / ".scx-code-agent.yaml").write_text("test: true")
         monkeypatch.chdir(tmp_path)
 
-        assert find_config_file() == Path(".code-agent.yaml")
+        assert find_config_file() == Path(".scx-code-agent.yaml")
 
     def test_load_config_file_with_env_substitution(self, tmp_path, monkeypatch):
         """环境变量替换 ${VAR} 语法"""
-        config_file = tmp_path / ".code-agent.yaml"
+        config_file = tmp_path / ".scx-code-agent.yaml"
         config_file.write_text("""
 provider:
   name: test-provider
@@ -54,7 +54,7 @@ provider:
 
     def test_config_priority_env_over_file(self, tmp_path, monkeypatch):
         """环境变量优先级高于配置文件"""
-        config_file = tmp_path / ".code-agent.yaml"
+        config_file = tmp_path / ".scx-code-agent.yaml"
         config_file.write_text("""
 provider:
   name: file-provider

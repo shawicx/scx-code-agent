@@ -12,7 +12,7 @@ poetry install
 
 ### 方式一：配置文件（推荐）
 
-在项目根目录创建 `.code-agent.yaml`：
+在项目根目录创建 `.scx-code-agent.yaml`：
 
 ```yaml
 provider:
@@ -30,7 +30,7 @@ review:
 
 示例配置文件：
 ```bash
-cp .code-agent.yaml.example .code-agent.yaml
+cp .scx-code-agent.yaml.example .scx-code-agent.yaml
 ```
 
 ### 方式二：环境变量
@@ -51,26 +51,26 @@ cp .env.example .env
 
 ```bash
 # 扫描当前目录
-poetry run code-agent --all
+poetry run scx-code-agent --all
 
 # 扫描指定路径
-poetry run code-agent --path src/
+poetry run scx-code-agent --path src/
 ```
 
 ### 增量审查（PR）
 
 ```bash
-poetry run code-agent --diff origin/main
+poetry run scx-code-agent --diff origin/main
 ```
 
 ### 输出选项
 
 ```bash
 # 输出到文件
-poetry run code-agent --path src/ --output dist/report.md
+poetry run scx-code-agent --path src/ --output dist/report.md
 
 # JSON 格式输出
-poetry run code-agent --path src/ --format json --output dist/report.json
+poetry run scx-code-agent --path src/ --format json --output dist/report.json
 ```
 
 ### PR 评论（CI/CD）
@@ -82,7 +82,7 @@ poetry run code-agent --path src/ --format json --output dist/report.json
 export GITHUB_TOKEN=ghp_xxx
 
 # 发表 PR 评论
-poetry run code-agent --diff origin/main --pr-comment
+poetry run scx-code-agent --diff origin/main --pr-comment
 ```
 
 环境变量：
