@@ -32,10 +32,16 @@ class OutputConfig:
 
 
 @dataclass
+class GitHubConfig:
+    token: str = ""
+
+
+@dataclass
 class Config:
     provider: ProviderConfig = field(default_factory=ProviderConfig)
     review: ReviewConfig = field(default_factory=ReviewConfig)
     output: OutputConfig = field(default_factory=OutputConfig)
+    github: GitHubConfig = field(default_factory=GitHubConfig)
 
 
 _ENV_VAR_PATTERN = re.compile(r"\$\{([^}]+)\}")
@@ -52,45 +58,70 @@ def _substitute_env(value: Any) -> Any:
     return value
 
 
-def find_config_file() -> Optional[Path]:
+_CONFIG_CANDIDATES = [
+    ".scx-code-agent.yaml",
+    "scx-code-agent.yaml",
+    ".scx-code-agent.yml",
+    "scx-code-agent.yml",
+]
+
+
+def _find_project_config() -> Optional[Path]:
     """Find configuration file in current directory."""
-    candidates = [
-        Path(".scx-code-agent.yaml"),
-        Path("scx-code-agent.yaml"),
-        Path(".scx-code-agent.yml"),
-        Path("scx-code-agent.yml"),
-    ]
-    for candidate in candidates:
-        if candidate.exists():
-            return candidate
+    for name in _CONFIG_CANDIDATES:
+        p = Path(name)
+        if p.exists():
+            return p
     return None
 
 
-def load_config_file(config_path: Optional[Path] = None) -> Optional[Dict]:
-    """Load YAML configuration file."""
-    if config_path is None:
-        config_path = find_config_file()
+def _find_global_config() -> Optional[Path]:
+    """Find global configuration file in home directory."""
+    for name in _CONFIG_CANDIDATES:
+        p = Path.home() / name
+        if p.exists():
+            return p
+    return None
 
-    if config_path is None or not config_path.exists():
-        return None
 
+def _read_yaml(path: Path) -> Optional[Dict]:
+    """Read and env-substitute a YAML file."""
     try:
-        with open(config_path, "r", encoding="utf-8") as f:
+        with open(path, "r", encoding="utf-8") as f:
             data = yaml.safe_load(f)
             return _substitute_env(data) if data else {}
     except Exception as e:
-        print(f"Warning: Failed to load config file {config_path}: {e}")
+        print(f"Warning: Failed to load config file {path}: {e}")
         return None
 
 
+def _deep_merge(base: Dict, override: Dict) -> Dict:
+    """Recursively merge override into base. Override values win."""
+    merged = base.copy()
+    for key, value in override.items():
+        if key in merged and isinstance(merged[key], dict) and isinstance(value, dict):
+            merged[key] = _deep_merge(merged[key], value)
+        else:
+            merged[key] = value
+    return merged
+
+
 def load_config() -> Config:
-    """Load configuration (priority: file > env vars > defaults)."""
+    """Load configuration (priority: env vars > project config > global config > defaults)."""
     load_dotenv()
 
-    # Load config file
-    config_data = load_config_file()
-    if config_data is None:
-        config_data = {}
+    # Load global config first, then project config overrides it
+    config_data: Dict = {}
+    global_path = _find_global_config()
+    if global_path:
+        global_data = _read_yaml(global_path)
+        if global_data:
+            config_data = global_data
+    project_path = _find_project_config()
+    if project_path:
+        project_data = _read_yaml(project_path)
+        if project_data:
+            config_data = _deep_merge(config_data, project_data)
 
     # Extract provider configuration
     provider_config = config_data.get("provider", {})
@@ -104,6 +135,10 @@ def load_config() -> Config:
 
     # Extract output configuration
     output_config = config_data.get("output", {})
+
+    # Extract github configuration
+    github_config = config_data.get("github", {})
+    github_token = os.getenv("GITHUB_TOKEN", github_config.get("token", ""))
 
     return Config(
         provider=ProviderConfig(
@@ -121,5 +156,8 @@ def load_config() -> Config:
         output=OutputConfig(
             default_format=output_config.get("default_format", "markdown"),
             default_path=output_config.get("default_path", "dist/report.md"),
+        ),
+        github=GitHubConfig(
+            token=github_token,
         ),
     )

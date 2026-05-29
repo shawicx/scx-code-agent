@@ -86,7 +86,7 @@ def audit(all, diff, path, output, format, pr_comment):
         try:
             from github_client import GitHubClient
 
-            github_token = os.getenv("GITHUB_TOKEN")
+            github_token = config.github.token
             if not github_token:
                 console.print("[yellow]警告: GITHUB_TOKEN 未设置，跳过 PR 评论[/yellow]")
                 return

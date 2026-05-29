@@ -38,3 +38,7 @@ output:
   default_format: markdown
   # Default output path
   default_path: dist/report.md
+
+github:
+  # GitHub token for PR comments (supports environment variable references)
+  token: ${GITHUB_TOKEN}
