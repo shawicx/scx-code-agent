@@ -125,16 +125,19 @@ def load_config() -> Config:
 
     # Extract provider configuration
     provider_config = config_data.get("provider", {})
-    provider_name = os.getenv("LLM_PROVIDER", provider_config.get("name", "anthropic"))
-    provider_model = os.getenv("LLM_MODEL", provider_config.get("model", "claude-sonnet-4-20250514"))
-    provider_key = os.getenv("LLM_API_KEY", provider_config.get("api_key", ""))
-    provider_base_url = os.getenv("LLM_BASE_URL", provider_config.get("base_url"))
+    default_provider = ProviderConfig()
+    provider_name = os.getenv("LLM_PROVIDER", provider_config.get("name", default_provider.name))
+    provider_model = os.getenv("LLM_MODEL", provider_config.get("model", default_provider.model))
+    provider_key = os.getenv("LLM_API_KEY", provider_config.get("api_key", default_provider.api_key))
+    provider_base_url = os.getenv("LLM_BASE_URL", provider_config.get("base_url", default_provider.base_url))
 
     # Extract review configuration
     review_config = config_data.get("review", {})
+    default_review = ReviewConfig()
 
     # Extract output configuration
     output_config = config_data.get("output", {})
+    default_output = OutputConfig()
 
     # Extract github configuration
     github_config = config_data.get("github", {})
@@ -148,14 +151,14 @@ def load_config() -> Config:
             base_url=provider_base_url,
         ),
         review=ReviewConfig(
-            max_workers=review_config.get("max_workers", 5),
-            context_lines=review_config.get("context_lines", 3),
-            skip_dirs=review_config.get("skip_dirs", []),
-            skip_extensions=review_config.get("skip_extensions", []),
+            max_workers=review_config.get("max_workers", default_review.max_workers),
+            context_lines=review_config.get("context_lines", default_review.context_lines),
+            skip_dirs=review_config.get("skip_dirs", default_review.skip_dirs),
+            skip_extensions=review_config.get("skip_extensions", default_review.skip_extensions),
         ),
         output=OutputConfig(
-            default_format=output_config.get("default_format", "markdown"),
-            default_path=output_config.get("default_path", "dist/report.md"),
+            default_format=output_config.get("default_format", default_output.default_format),
+            default_path=output_config.get("default_path", default_output.default_path),
         ),
         github=GitHubConfig(
             token=github_token,

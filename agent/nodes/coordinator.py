@@ -46,7 +46,10 @@ def _scan_directory(base_path: Path) -> list:
 
 def coordinator_node(state: SharedReviewState) -> SharedReviewState:
     """协调者节点：扫描目录收集代码文件"""
+    result = {**state}
     mode = state.get("mode", "all")
+    result["mode"] = mode
+    result["final_report"] = ""
 
     if mode == "all":
         target_files = _scan_directory(Path("."))
@@ -54,16 +57,9 @@ def coordinator_node(state: SharedReviewState) -> SharedReviewState:
     elif mode == "diff":
         diff_branch = state.get("diff_branch", "")
         if not diff_branch:
-            return {
-                "target_files": [],
-                "raw_comments": state.get("raw_comments", []),
-                "mode": mode,
-                "final_report": "",
-                "diff_branch": "",
-                "target_path": state.get("target_path", ""),
-                "output_format": state.get("output_format", ""),
-                "progress": state.get("progress"),
-            }
+            result["target_files"] = []
+            result["diff_branch"] = ""
+            return result
 
         changed_files = get_diff_files(diff_branch)
         changed_files = filter_code_files(changed_files)
@@ -87,29 +83,14 @@ def coordinator_node(state: SharedReviewState) -> SharedReviewState:
     elif mode == "path":
         target_path_str = state.get("target_path", "")
         if not target_path_str:
-            return {
-                "target_files": [],
-                "raw_comments": state.get("raw_comments", []),
-                "mode": mode,
-                "final_report": "",
-                "diff_branch": state.get("diff_branch", ""),
-                "target_path": "",
-                "output_format": state.get("output_format", ""),
-                "progress": state.get("progress"),
-            }
+            result["target_files"] = []
+            result["target_path"] = ""
+            return result
 
         base_path = Path(target_path_str)
         if not base_path.exists():
-            return {
-                "target_files": [],
-                "raw_comments": state.get("raw_comments", []),
-                "mode": mode,
-                "final_report": "",
-                "diff_branch": state.get("diff_branch", ""),
-                "target_path": target_path_str,
-                "output_format": state.get("output_format", ""),
-                "progress": state.get("progress"),
-            }
+            result["target_files"] = []
+            return result
 
         if base_path.is_file() and base_path.suffix in SUPPORTED_EXTENSIONS:
             try:
@@ -126,13 +107,5 @@ def coordinator_node(state: SharedReviewState) -> SharedReviewState:
     else:
         target_files = []
 
-    return {
-        "target_files": target_files,
-        "raw_comments": state.get("raw_comments", []),
-        "mode": mode,
-        "final_report": "",
-        "diff_branch": state.get("diff_branch", ""),
-        "target_path": state.get("target_path", ""),
-        "output_format": state.get("output_format", ""),
-        "progress": state.get("progress"),
-    }
+    result["target_files"] = target_files
+    return result

@@ -8,6 +8,18 @@ from agent.state import AgentIssue
 class ReportFormatter(ABC):
     """报告格式化器基类"""
 
+    @staticmethod
+    def compute_statistics(issues: List[AgentIssue]) -> Dict:
+        """计算问题统计信息"""
+        level_counts = Counter(issue.get("level", "Info") for issue in issues)
+        category_counts = Counter(issue.get("category", "Unknown") for issue in issues)
+        files_affected = len(set(issue.get("file_path", "") for issue in issues))
+        return {
+            "level_counts": level_counts,
+            "category_counts": category_counts,
+            "files_affected": files_affected,
+        }
+
     @abstractmethod
     def format(self, issues: List[AgentIssue]) -> str:
         """格式化问题列表为报告字符串"""
@@ -46,9 +58,10 @@ class MarkdownFormatter(ReportFormatter):
         """格式化摘要部分"""
         lines = ["## Summary\n\n"]
 
-        level_counts = Counter(issue.get("level", "Info") for issue in issues)
-        category_counts = Counter(issue.get("category", "Unknown") for issue in issues)
-        files_affected = len(set(issue.get("file_path", "") for issue in issues))
+        stats = self.compute_statistics(issues)
+        level_counts = stats["level_counts"]
+        category_counts = stats["category_counts"]
+        files_affected = stats["files_affected"]
 
         lines.append(f"- **Total Issues**: {len(issues)}\n")
         lines.append("- **By Level**: ")
@@ -109,21 +122,18 @@ class JSONFormatter(ReportFormatter):
 
     def format(self, issues: List[AgentIssue]) -> str:
         import json
-        from collections import Counter
 
         if not issues:
             return json.dumps({"summary": {"total_issues": 0}, "issues": []}, indent=2)
 
-        level_counts = Counter(issue.get("level", "Info") for issue in issues)
-        category_counts = Counter(issue.get("category", "Unknown") for issue in issues)
-        files_affected = len(set(issue.get("file_path", "") for issue in issues))
+        stats = self.compute_statistics(issues)
 
         report = {
             "summary": {
                 "total_issues": len(issues),
-                "by_level": dict(level_counts),
-                "by_category": dict(category_counts),
-                "files_affected": files_affected,
+                "by_level": dict(stats["level_counts"]),
+                "by_category": dict(stats["category_counts"]),
+                "files_affected": stats["files_affected"],
             },
             "issues": issues,
         }
