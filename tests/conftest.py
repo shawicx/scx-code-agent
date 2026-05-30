@@ -26,6 +26,12 @@ def temp_git_repo(tmp_path):
         capture_output=True,
         check=True,
     )
+    subprocess.run(
+        ["git", "checkout", "-b", "main"],
+        cwd=repo_path,
+        capture_output=True,
+        check=True,
+    )
 
     yield repo_path
 

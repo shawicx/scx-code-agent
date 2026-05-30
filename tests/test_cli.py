@@ -19,6 +19,8 @@ def mock_config():
     mock_cfg = MagicMock()
     mock_cfg.provider.name = "openai"
     mock_cfg.provider.model = "gpt-4"
+    mock_cfg.github.token = ""
+    mock_cfg.output.default_path = "dist/report.md"
     return mock_cfg
 
 
@@ -185,6 +187,7 @@ class TestCLIPRComment:
         mock_gh = MagicMock()
         mock_gh.get_current_pr.return_value = 42
         mock_gh.post_pr_comment.return_value = True
+        mock_config.github.token = "fake-token"
 
         with (
             patch("cli.load_config", return_value=mock_config),
@@ -201,6 +204,7 @@ class TestCLIPRComment:
         """--pr-comment when no PR is found shows warning."""
         mock_gh = MagicMock()
         mock_gh.get_current_pr.return_value = None
+        mock_config.github.token = "fake-token"
 
         with (
             patch("cli.load_config", return_value=mock_config),
@@ -218,6 +222,7 @@ class TestCLIPRComment:
         mock_gh = MagicMock()
         mock_gh.get_current_pr.return_value = 42
         mock_gh.post_pr_comment.return_value = False
+        mock_config.github.token = "fake-token"
 
         with (
             patch("cli.load_config", return_value=mock_config),
@@ -233,6 +238,7 @@ class TestCLIPRComment:
 
     def test_pr_comment_import_error(self, runner, mock_config, mock_graph_result):
         """--pr-comment when PyGitHub not installed shows warning."""
+        mock_config.github.token = "fake-token"
         with (
             patch("cli.load_config", return_value=mock_config),
             _patch_graph(mock_graph_result),
@@ -246,6 +252,7 @@ class TestCLIPRComment:
 
     def test_pr_comment_generic_exception(self, runner, mock_config, mock_graph_result):
         """--pr-comment when a generic exception occurs shows error."""
+        mock_config.github.token = "fake-token"
         with (
             patch("cli.load_config", return_value=mock_config),
             _patch_graph(mock_graph_result),

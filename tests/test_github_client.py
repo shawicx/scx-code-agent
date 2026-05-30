@@ -26,7 +26,7 @@ class TestDetectRepoInfo:
             "GITHUB_REPOSITORY": "owner/repo",
             "GITHUB_REF_NAME": "feature-branch",
             "GITHUB_SHA": "abc123",
-            "GITHUB_EVENT_PATH": "/event.json",
+            "GITHUB_EVENT_PATH": "",
         }
         with patch.dict(os.environ, env, clear=False):
             result = detect_repo_info()
@@ -34,9 +34,33 @@ class TestDetectRepoInfo:
         assert result["repo"] == "owner/repo"
         assert result["ref"] == "feature-branch"
         assert result["sha"] == "abc123"
-        assert result["event_path"] == "/event.json"
 
         # Cleanup cache
+        github_client._repo_info_cache.clear()
+
+    def test_from_github_actions_pr_event(self, tmp_path):
+        """Detects source branch and PR number from pull_request event payload."""
+        import github_client
+
+        github_client._repo_info_cache.clear()
+
+        event_file = tmp_path / "event.json"
+        event_file.write_text('{"pull_request": {"number": 42, "head": {"ref": "feature-x"}}}')
+
+        env = {
+            "GITHUB_REPOSITORY": "owner/repo",
+            "GITHUB_REF_NAME": "42/merge",
+            "GITHUB_SHA": "abc123",
+            "GITHUB_EVENT_PATH": str(event_file),
+        }
+        with patch.dict(os.environ, env, clear=False):
+            result = detect_repo_info()
+
+        assert result["repo"] == "owner/repo"
+        assert result["ref"] == "feature-x"
+        assert result["pr_number"] == "42"
+        assert result["sha"] == "abc123"
+
         github_client._repo_info_cache.clear()
 
     def test_from_git_remote_ssh(self):
@@ -255,6 +279,16 @@ class TestGetCurrentPR:
 
         result = client.get_current_pr(branch="any-branch")
         assert result is None
+
+    def test_uses_cached_pr_number(self):
+        """Returns PR number from cached event payload without API call."""
+        client = self._make_client()
+
+        with patch("github_client.detect_repo_info", return_value={"pr_number": "42", "ref": "feature-x"}):
+            result = client.get_current_pr()
+
+        assert result == 42
+        client.repo.get_pulls.assert_not_called()
 
 
 class TestPostPRComment:

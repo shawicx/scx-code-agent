@@ -10,7 +10,8 @@ from agent.state import SharedReviewState
 class TestE2EAllMode:
     """E2E tests for --all mode (full codebase scan)."""
 
-    def test_all_mode_empty_directory(self, tmp_path):
+    @patch("agent.nodes.base_expert.LLMClient")
+    def test_all_mode_empty_directory(self, mock_llm, tmp_path):
         """--all 模式扫描空目录应返回无问题报告"""
         graph = create_review_graph()
         state: SharedReviewState = {
@@ -110,7 +111,8 @@ class TestE2EAllMode:
 class TestE2EOutputFormats:
     """E2E tests for output format switching."""
 
-    def test_json_output_format(self):
+    @patch("agent.nodes.base_expert.LLMClient")
+    def test_json_output_format(self, mock_llm):
         """JSON 输出格式应返回有效 JSON"""
         graph = create_review_graph()
         state: SharedReviewState = {
@@ -132,7 +134,8 @@ class TestE2EOutputFormats:
         assert "summary" in data
         assert "issues" in data
 
-    def test_markdown_output_format(self):
+    @patch("agent.nodes.base_expert.LLMClient")
+    def test_markdown_output_format(self, mock_llm):
         """Markdown 输出格式应包含标题"""
         graph = create_review_graph()
         state: SharedReviewState = {

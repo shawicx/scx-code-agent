@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 from typing import Dict, List, Optional
@@ -32,9 +33,27 @@ def detect_repo_info() -> Dict[str, str | None]:
     # GitHub Actions 环境变量
     if os.getenv("GITHUB_REPOSITORY"):
         info["repo"] = os.getenv("GITHUB_REPOSITORY")
-        info["ref"] = os.getenv("GITHUB_REF_NAME") or None
         info["sha"] = os.getenv("GITHUB_SHA") or None
-        info["event_path"] = os.getenv("GITHUB_EVENT_PATH") or None
+
+        # 从 event payload 获取真实的源分支名和 PR 编号
+        event_path = os.getenv("GITHUB_EVENT_PATH")
+        if event_path and os.path.isfile(event_path):
+            try:
+                with open(event_path) as f:
+                    event = json.load(f)
+                # pull_request 事件：获取源分支名和 PR 编号
+                pr = event.get("pull_request")
+                if pr:
+                    info["ref"] = pr.get("head", {}).get("ref")
+                    info["pr_number"] = str(pr.get("number"))
+                else:
+                    info["ref"] = os.getenv("GITHUB_REF_NAME") or None
+            except Exception as e:
+                logger.warning(f"Failed to parse event payload: {e}")
+                info["ref"] = os.getenv("GITHUB_REF_NAME") or None
+        else:
+            info["ref"] = os.getenv("GITHUB_REF_NAME") or None
+
         _repo_info_cache.update(info)
         return info
 
@@ -98,8 +117,17 @@ class GitHubClient:
         Returns:
             PR 编号，如果没有找到则返回 None
         """
+        detected = detect_repo_info()
+
+        # 优先从 GitHub Actions event payload 获取 PR 编号
+        pr_number_str = detected.get("pr_number")
+        if pr_number_str:
+            try:
+                return int(pr_number_str)
+            except ValueError:
+                pass
+
         if not branch:
-            detected = detect_repo_info()
             branch = detected.get("ref", "")
 
         if not branch:
