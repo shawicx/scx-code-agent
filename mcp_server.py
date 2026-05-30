@@ -20,18 +20,16 @@ def _run_review(state: SharedReviewState) -> str:
 
 
 def _make_state(**overrides) -> SharedReviewState:
-    base: SharedReviewState = {
-        "mode": "",
-        "target_files": [],
-        "raw_comments": [],
-        "final_report": "",
-        "diff_branch": "",
-        "target_path": "",
-        "output_format": "markdown",
-        "progress": None,
+    return {
+        "mode": overrides.get("mode", ""),
+        "target_files": overrides.get("target_files", []),
+        "raw_comments": overrides.get("raw_comments", []),
+        "final_report": overrides.get("final_report", ""),
+        "diff_branch": overrides.get("diff_branch", ""),
+        "target_path": overrides.get("target_path", ""),
+        "output_format": overrides.get("output_format", "markdown"),
+        "progress": overrides.get("progress"),
     }
-    base.update(overrides)
-    return base
 
 
 def _do_review_path(path: str, format: str = "markdown") -> str:

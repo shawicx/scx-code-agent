@@ -1,7 +1,7 @@
 from pathlib import Path
 from unittest.mock import patch
 
-from config import find_config_file, load_config, load_config_file
+from config import _find_project_config as find_config_file, _read_yaml as load_config_file, load_config
 
 
 class TestConfigLoading:

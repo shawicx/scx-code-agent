@@ -46,7 +46,7 @@ def _scan_directory(base_path: Path) -> list:
 
 def coordinator_node(state: SharedReviewState) -> SharedReviewState:
     """协调者节点：扫描目录收集代码文件"""
-    result = {**state}
+    result: SharedReviewState = {**state}
     mode = state.get("mode", "all")
     result["mode"] = mode
     result["final_report"] = ""
