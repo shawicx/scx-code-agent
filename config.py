@@ -18,11 +18,20 @@ class ProviderConfig:
 
 
 @dataclass
+class CustomRulesConfig:
+    general: List[str] = field(default_factory=list)
+    security: List[str] = field(default_factory=list)
+    architecture: List[str] = field(default_factory=list)
+    performance: List[str] = field(default_factory=list)
+
+
+@dataclass
 class ReviewConfig:
     max_workers: int = 5
     context_lines: int = 3
     skip_dirs: List[str] = field(default_factory=list)
     skip_extensions: List[str] = field(default_factory=list)
+    custom_rules: CustomRulesConfig = field(default_factory=CustomRulesConfig)
 
 
 @dataclass
@@ -135,6 +144,10 @@ def load_config() -> Config:
     review_config = config_data.get("review", {})
     default_review = ReviewConfig()
 
+    # Extract custom rules
+    custom_rules_data = review_config.get("custom_rules", {})
+    default_custom = CustomRulesConfig()
+
     # Extract output configuration
     output_config = config_data.get("output", {})
     default_output = OutputConfig()
@@ -155,6 +168,12 @@ def load_config() -> Config:
             context_lines=review_config.get("context_lines", default_review.context_lines),
             skip_dirs=review_config.get("skip_dirs", default_review.skip_dirs),
             skip_extensions=review_config.get("skip_extensions", default_review.skip_extensions),
+            custom_rules=CustomRulesConfig(
+                general=custom_rules_data.get("general", default_custom.general),
+                security=custom_rules_data.get("security", default_custom.security),
+                architecture=custom_rules_data.get("architecture", default_custom.architecture),
+                performance=custom_rules_data.get("performance", default_custom.performance),
+            ),
         ),
         output=OutputConfig(
             default_format=output_config.get("default_format", default_output.default_format),

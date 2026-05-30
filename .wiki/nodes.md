@@ -33,7 +33,7 @@
 | 文件 | `agent/nodes/sec_expert.py` |
 | 函数 | `sec_expert_node(state)` |
 | 角色 | 安全审查专家 |
-| Prompt | `security.md` + `base.md` |
+| Prompt | `security.md` + `base.md` + custom_rules(security) |
 
 **输入 State**: `target_files`, `mode`
 
@@ -56,7 +56,7 @@
 | 文件 | `agent/nodes/arch_expert.py` |
 | 函数 | `arch_expert_node(state)` |
 | 角色 | 架构审查专家 |
-| Prompt | `architecture.md` + `base.md` |
+| Prompt | `architecture.md` + `base.md` + custom_rules(architecture) |
 
 **输入 State**: `target_files`, `mode`
 
@@ -79,7 +79,7 @@
 | 文件 | `agent/nodes/perf_expert.py` |
 | 函数 | `perf_expert_node(state)` |
 | 角色 | 性能审查专家 |
-| Prompt | `performance.md` + `base.md` |
+| Prompt | `performance.md` + `base.md` + custom_rules(performance) |
 
 **输入 State**: `target_files`, `mode`
 

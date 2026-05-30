@@ -48,7 +48,7 @@ AgentIssue:
 ## Prompt 体系
 
 ```
-system_message = base.md + role_prompt
+system_message = base.md + role_prompt + custom_rules_section
 user_message = "请审查以下代码文件：{path}\n```{lang}\n{code}\n```"
 ```
 
@@ -58,6 +58,7 @@ user_message = "请审查以下代码文件：{path}\n```{lang}\n{code}\n```"
 | security.md | 安全专家 |
 | architecture.md | 架构专家 |
 | performance.md | 性能专家 |
+| custom_rules | 项目特定审查规则（可选，从配置注入） |
 
 ## LLM 调用链
 
@@ -89,3 +90,4 @@ Markdown 或 JSON 报告，可选 PR 评论。
 - diff 模式行号映射可能不准确
 - 无 memory、无 checkpoint、无 human-in-the-loop
 - 支持 anthropic/openai/deepseek/glm 四个 provider
+- 自定义审查规则通过 `review.custom_rules` 配置，注入到专家 prompt 末尾

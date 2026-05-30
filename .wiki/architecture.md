@@ -74,6 +74,7 @@ stateDiagram-v2
 node(state)
   → LLMClient()          # 初始化
   → load_prompt(role)     # 加载 prompt
+  → _build_custom_rules_section(role)  # 加载自定义规则（可选）
   → ThreadPoolExecutor:   # 并发处理文件
       → client.review_code(file, content, role_prompt, base_prompt, diff_lines)
           → _prepare_code_content()  # diff 模式裁剪
@@ -99,7 +100,8 @@ node(state)
 | 模块 | 职责 |
 |------|------|
 | `cli.py` | 参数解析、State 初始化、Graph 调用、输出 |
-| `config.py` | YAML + env 配置加载，环境变量替换 |
+| `config.py` | YAML + env 配置加载，环境变量替换，自定义审查规则 |
+| `agent/nodes/base_expert.py` | 共享专家逻辑，自定义规则注入 prompt |
 | `llm_client.py` | LLM 调用封装，重试，JSON 解析修复，Pydantic 验证 |
 | `agent/graph.py` | StateGraph 拓扑定义 |
 | `agent/state.py` | State 和 Issue 类型定义 |

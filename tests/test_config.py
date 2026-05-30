@@ -1,7 +1,16 @@
 from pathlib import Path
 from unittest.mock import patch
 
-from config import _find_project_config as find_config_file, _read_yaml as load_config_file, load_config
+from config import (
+    CustomRulesConfig,
+    load_config,
+)
+from config import (
+    _find_project_config as find_config_file,
+)
+from config import (
+    _read_yaml as load_config_file,
+)
 
 
 class TestConfigLoading:
@@ -65,3 +74,73 @@ provider:
 
         config = load_config()
         assert config.provider.name == "env-provider"
+
+
+class TestCustomRulesConfig:
+    def test_default_custom_rules_empty(self):
+        """默认配置所有规则列表为空"""
+        rules = CustomRulesConfig()
+        assert rules.general == []
+        assert rules.security == []
+        assert rules.architecture == []
+        assert rules.performance == []
+
+    @patch("config.load_dotenv")
+    def test_load_config_with_custom_rules(self, mock_load_dotenv, tmp_path, monkeypatch):
+        """YAML 含 custom_rules 时正确解析"""
+        config_file = tmp_path / ".scx-code-agent.yaml"
+        config_file.write_text("""
+review:
+  custom_rules:
+    general:
+      - "必须用 pytest"
+      - "所有函数必须有类型注解"
+    security:
+      - "禁止打印用户手机号"
+""")
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.delenv("LLM_PROVIDER", raising=False)
+        monkeypatch.delenv("LLM_MODEL", raising=False)
+        monkeypatch.delenv("LLM_API_KEY", raising=False)
+        monkeypatch.delenv("LLM_BASE_URL", raising=False)
+
+        config = load_config()
+        assert config.review.custom_rules.general == ["必须用 pytest", "所有函数必须有类型注解"]
+        assert config.review.custom_rules.security == ["禁止打印用户手机号"]
+        assert config.review.custom_rules.architecture == []
+        assert config.review.custom_rules.performance == []
+
+    @patch("config.load_dotenv")
+    def test_load_config_without_custom_rules(self, mock_load_dotenv, tmp_path, monkeypatch):
+        """无 custom_rules 键时使用默认空值"""
+        config_file = tmp_path / ".scx-code-agent.yaml"
+        config_file.write_text("""
+provider:
+  name: test
+""")
+        monkeypatch.chdir(tmp_path)
+        monkeypatch.delenv("LLM_PROVIDER", raising=False)
+        monkeypatch.delenv("LLM_MODEL", raising=False)
+        monkeypatch.delenv("LLM_API_KEY", raising=False)
+        monkeypatch.delenv("LLM_BASE_URL", raising=False)
+
+        config = load_config()
+        assert config.review.custom_rules.general == []
+        assert config.review.custom_rules.security == []
+        assert config.review.custom_rules.architecture == []
+        assert config.review.custom_rules.performance == []
+
+    def test_custom_rules_env_substitution(self, tmp_path, monkeypatch):
+        """规则内 ${VAR} 被替换"""
+        config_file = tmp_path / ".scx-code-agent.yaml"
+        config_file.write_text("""
+review:
+  custom_rules:
+    general:
+      - "禁止使用 ${BANNED_LIB}"
+""")
+        monkeypatch.setenv("BANNED_LIB", "unittest")
+        monkeypatch.chdir(tmp_path)
+
+        data = load_config_file(config_file)
+        assert data["review"]["custom_rules"]["general"] == ["禁止使用 unittest"]

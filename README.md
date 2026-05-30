@@ -26,6 +26,11 @@ review:
   skip_dirs:
     - node_modules
     - .venv
+  custom_rules:
+    general:
+      - "本项目禁止使用 unittest，必须用 pytest"
+    security:
+      - "禁止在日志中打印用户手机号"
 ```
 
 示例配置文件：
@@ -88,6 +93,25 @@ poetry run scx-code-agent --diff origin/main --pr-comment
 环境变量：
 - `GITHUB_TOKEN`: GitHub Personal Access Token（需要 `repo:status` 权限）
 - `GITHUB_REPOSITORY`: 仓库路径（可选，通常自动检测）
+
+### 自定义审查规则
+
+在配置文件的 `review.custom_rules` 中定义项目特定的审查规则，规则会被注入到对应专家的 prompt 中：
+
+```yaml
+review:
+  custom_rules:
+    general:                        # 所有专家通用
+      - "所有函数必须有类型注解"
+    security:                       # 仅安全专家
+      - "禁止在日志中打印用户手机号"
+    architecture:                   # 仅架构专家
+      - "Service 层禁止直接 import Controller"
+    performance:                    # 仅性能专家
+      - "数据库查询结果集超过 100 条必须分页"
+```
+
+`general` 中的规则对所有专家生效，其余仅对对应专家生效。规则支持 `${VAR}` 环境变量替换。
 
 ## 架构
 

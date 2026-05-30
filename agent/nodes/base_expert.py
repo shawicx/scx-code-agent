@@ -3,9 +3,36 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import Any, Dict, List, Optional
 
 from agent.state import AgentIssue, SharedReviewState
+from config import load_config
 from llm_client import LLMClient, load_prompt
 
 logger = logging.getLogger(__name__)
+
+
+_EXPERT_KEY_MAP = {
+    "security.md": "security",
+    "architecture.md": "architecture",
+    "performance.md": "performance",
+}
+
+
+def _build_custom_rules_section(role_prompt_file: str) -> str:
+    """根据配置构建追加到专家 prompt 的自定义规则段落。"""
+    config = load_config()
+    rules = config.review.custom_rules
+
+    applicable = list(rules.general)
+    expert_key = _EXPERT_KEY_MAP.get(role_prompt_file)
+    if expert_key:
+        applicable.extend(getattr(rules, expert_key, []))
+
+    if not applicable:
+        return ""
+
+    lines = ["\n\n## 项目自定义审查规则\n\n", "你必须严格遵守以下项目特定的审查规则：\n\n"]
+    for i, rule in enumerate(applicable, 1):
+        lines.append(f"{i}. {rule}\n")
+    return "".join(lines)
 
 
 def _review_single_file(
@@ -38,6 +65,10 @@ def _run_expert(
     client = LLMClient()
     role_prompt = load_prompt(role_prompt_file)
     base_prompt = load_prompt("base.md")
+
+    custom_rules_section = _build_custom_rules_section(role_prompt_file)
+    if custom_rules_section:
+        role_prompt = role_prompt + custom_rules_section
 
     target_files = state.get("target_files", [])
     mode = state.get("mode", "all")

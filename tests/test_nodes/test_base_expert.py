@@ -2,7 +2,7 @@ from unittest.mock import MagicMock, patch
 
 import pytest
 
-from agent.nodes.base_expert import _review_single_file, _run_expert
+from agent.nodes.base_expert import _build_custom_rules_section, _review_single_file, _run_expert
 
 
 class TestReviewSingleFile:
@@ -163,3 +163,63 @@ class TestRunExpert:
             _run_expert(sample_state, "security.md", "Security")
 
         assert mock_client.review_code.call_count == 1
+
+
+class TestBuildCustomRulesSection:
+    """测试自定义规则段落构建"""
+
+    def test_no_custom_rules_returns_empty(self):
+        """无规则时返回空字符串"""
+        mock_config = MagicMock()
+        mock_config.review.custom_rules.general = []
+        mock_config.review.custom_rules.security = []
+        mock_config.review.custom_rules.architecture = []
+        mock_config.review.custom_rules.performance = []
+
+        with patch("agent.nodes.base_expert.load_config", return_value=mock_config):
+            result = _build_custom_rules_section("security.md")
+
+        assert result == ""
+
+    def test_general_rules_appended_to_all_experts(self):
+        """general 规则对所有专家生效"""
+        mock_config = MagicMock()
+        mock_config.review.custom_rules.general = ["必须用 pytest"]
+        mock_config.review.custom_rules.security = []
+        mock_config.review.custom_rules.architecture = []
+        mock_config.review.custom_rules.performance = []
+
+        with patch("agent.nodes.base_expert.load_config", return_value=mock_config):
+            for prompt_file in ["security.md", "architecture.md", "performance.md"]:
+                result = _build_custom_rules_section(prompt_file)
+                assert "必须用 pytest" in result
+                assert "项目自定义审查规则" in result
+
+    def test_expert_specific_rules(self):
+        """专家专属规则仅对对应专家生效"""
+        mock_config = MagicMock()
+        mock_config.review.custom_rules.general = []
+        mock_config.review.custom_rules.security = ["禁止打印手机号"]
+        mock_config.review.custom_rules.architecture = []
+        mock_config.review.custom_rules.performance = []
+
+        with patch("agent.nodes.base_expert.load_config", return_value=mock_config):
+            sec_result = _build_custom_rules_section("security.md")
+            assert "禁止打印手机号" in sec_result
+
+            arch_result = _build_custom_rules_section("architecture.md")
+            assert "禁止打印手机号" not in arch_result
+
+    def test_general_plus_expert_combined(self):
+        """general + expert 规则合并"""
+        mock_config = MagicMock()
+        mock_config.review.custom_rules.general = ["所有函数必须有类型注解"]
+        mock_config.review.custom_rules.security = ["禁止硬编码密钥"]
+        mock_config.review.custom_rules.architecture = []
+        mock_config.review.custom_rules.performance = []
+
+        with patch("agent.nodes.base_expert.load_config", return_value=mock_config):
+            result = _build_custom_rules_section("security.md")
+
+        assert "所有函数必须有类型注解" in result
+        assert "禁止硬编码密钥" in result
