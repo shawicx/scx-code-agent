@@ -71,6 +71,7 @@ def sample_state():
         "diff_branch": "",
         "target_path": ".",
         "output_format": "markdown",
+        "progress": None,
     }
 
 

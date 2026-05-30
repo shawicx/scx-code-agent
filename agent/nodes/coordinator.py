@@ -62,6 +62,7 @@ def coordinator_node(state: SharedReviewState) -> SharedReviewState:
                 "diff_branch": "",
                 "target_path": state.get("target_path", ""),
                 "output_format": state.get("output_format", ""),
+                "progress": state.get("progress"),
             }
 
         changed_files = get_diff_files(diff_branch)
@@ -94,6 +95,7 @@ def coordinator_node(state: SharedReviewState) -> SharedReviewState:
                 "diff_branch": state.get("diff_branch", ""),
                 "target_path": "",
                 "output_format": state.get("output_format", ""),
+                "progress": state.get("progress"),
             }
 
         base_path = Path(target_path_str)
@@ -106,6 +108,7 @@ def coordinator_node(state: SharedReviewState) -> SharedReviewState:
                 "diff_branch": state.get("diff_branch", ""),
                 "target_path": target_path_str,
                 "output_format": state.get("output_format", ""),
+                "progress": state.get("progress"),
             }
 
         if base_path.is_file() and base_path.suffix in SUPPORTED_EXTENSIONS:
@@ -131,4 +134,5 @@ def coordinator_node(state: SharedReviewState) -> SharedReviewState:
         "diff_branch": state.get("diff_branch", ""),
         "target_path": state.get("target_path", ""),
         "output_format": state.get("output_format", ""),
+        "progress": state.get("progress"),
     }

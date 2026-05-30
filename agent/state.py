@@ -1,5 +1,5 @@
 import operator
-from typing import Annotated, List, TypedDict
+from typing import Annotated, Any, List, Optional, TypedDict
 
 
 class AgentIssue(TypedDict):
@@ -19,3 +19,4 @@ class SharedReviewState(TypedDict):
     diff_branch: str
     target_path: str
     output_format: str
+    progress: Optional[Any]

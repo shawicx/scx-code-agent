@@ -37,12 +37,12 @@ class TestReviewGraph:
         mock_client.review_code.return_value = []
 
         with (
-            patch("agent.nodes.sec_expert.LLMClient", return_value=mock_client),
-            patch("agent.nodes.arch_expert.LLMClient", return_value=mock_client),
-            patch("agent.nodes.perf_expert.LLMClient", return_value=mock_client),
-            patch("agent.nodes.sec_expert.load_prompt", return_value=""),
-            patch("agent.nodes.arch_expert.load_prompt", return_value=""),
-            patch("agent.nodes.perf_expert.load_prompt", return_value=""),
+            patch("agent.nodes.base_expert.LLMClient", return_value=mock_client),
+            patch("agent.nodes.base_expert.LLMClient", return_value=mock_client),
+            patch("agent.nodes.base_expert.LLMClient", return_value=mock_client),
+            patch("agent.nodes.base_expert.load_prompt", return_value=""),
+            patch("agent.nodes.base_expert.load_prompt", return_value=""),
+            patch("agent.nodes.base_expert.load_prompt", return_value=""),
         ):
             graph = create_review_graph()
             result = graph.invoke(sample_state)
@@ -104,12 +104,12 @@ class TestReviewGraph:
         mock_client_perf.review_code.side_effect = mock_review_code_perf
 
         with (
-            patch("agent.nodes.sec_expert.LLMClient", return_value=mock_client_sec),
-            patch("agent.nodes.arch_expert.LLMClient", return_value=mock_client_arch),
-            patch("agent.nodes.perf_expert.LLMClient", return_value=mock_client_perf),
-            patch("agent.nodes.sec_expert.load_prompt", return_value=""),
-            patch("agent.nodes.arch_expert.load_prompt", return_value=""),
-            patch("agent.nodes.perf_expert.load_prompt", return_value=""),
+            patch("agent.nodes.base_expert.LLMClient", return_value=mock_client_sec),
+            patch("agent.nodes.base_expert.LLMClient", return_value=mock_client_arch),
+            patch("agent.nodes.base_expert.LLMClient", return_value=mock_client_perf),
+            patch("agent.nodes.base_expert.load_prompt", return_value=""),
+            patch("agent.nodes.base_expert.load_prompt", return_value=""),
+            patch("agent.nodes.base_expert.load_prompt", return_value=""),
         ):
             graph = create_review_graph()
             result = graph.invoke(sample_state)
@@ -138,12 +138,12 @@ class TestReviewGraph:
         mock_client.review_code.return_value = []
 
         with (
-            patch("agent.nodes.sec_expert.LLMClient", return_value=mock_client),
-            patch("agent.nodes.arch_expert.LLMClient", return_value=mock_client),
-            patch("agent.nodes.perf_expert.LLMClient", return_value=mock_client),
-            patch("agent.nodes.sec_expert.load_prompt", return_value=""),
-            patch("agent.nodes.arch_expert.load_prompt", return_value=""),
-            patch("agent.nodes.perf_expert.load_prompt", return_value=""),
+            patch("agent.nodes.base_expert.LLMClient", return_value=mock_client),
+            patch("agent.nodes.base_expert.LLMClient", return_value=mock_client),
+            patch("agent.nodes.base_expert.LLMClient", return_value=mock_client),
+            patch("agent.nodes.base_expert.load_prompt", return_value=""),
+            patch("agent.nodes.base_expert.load_prompt", return_value=""),
+            patch("agent.nodes.base_expert.load_prompt", return_value=""),
         ):
             graph = create_review_graph()
             result = graph.invoke(sample_state)

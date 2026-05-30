@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 import click
@@ -60,13 +59,23 @@ def audit(all, diff, path, output, format, pr_comment):
         "diff_branch": diff or "",
         "target_path": path or "",
         "output_format": format,
+        "progress": None,
     }
 
     # 执行审查
-    graph = create_review_graph()
-    console.print("开始代码审查...\n")
+    from rich.progress import BarColumn, MofNCompleteColumn, Progress, SpinnerColumn, TextColumn
 
-    result = graph.invoke(initial_state)
+    graph = create_review_graph()
+
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("{task.description}"),
+        BarColumn(),
+        MofNCompleteColumn(),
+        console=console,
+    ) as progress:
+        initial_state["progress"] = progress
+        result = graph.invoke(initial_state)
     report = result.get("final_report", "# 无审查结果")
 
     # 输出报告

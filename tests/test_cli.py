@@ -85,6 +85,22 @@ class TestCLIModes:
 
         assert result.exit_code == 0
 
+    def test_all_mode_uses_progress(self, runner, mock_config, mock_graph_result):
+        """--all mode creates a Progress context and passes it to graph."""
+        mock_graph = MagicMock()
+        mock_graph.invoke.return_value = mock_graph_result
+
+        with (
+            patch("cli.load_config", return_value=mock_config),
+            patch("cli.create_review_graph", return_value=mock_graph),
+        ):
+            result = runner.invoke(audit, ["--all"])
+
+        assert result.exit_code == 0
+        # Verify progress was passed in the state
+        invoke_args = mock_graph.invoke.call_args[0][0]
+        assert invoke_args.get("progress") is not None
+
     def test_path_mode_empty_path_aborts(self, runner, mock_config):
         """--path without a value should abort (click enforces type=str, default=None)."""
         # Click's type=str with default=None means empty string isn't naturally produced.

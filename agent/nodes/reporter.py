@@ -69,4 +69,5 @@ def reporter_node(state: SharedReviewState) -> SharedReviewState:
         "diff_branch": state.get("diff_branch", ""),
         "target_path": state.get("target_path", ""),
         "output_format": state.get("output_format", ""),
+        "progress": state.get("progress"),
     }

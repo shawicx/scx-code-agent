@@ -28,6 +28,7 @@ def _make_state(**overrides) -> SharedReviewState:
         "diff_branch": "",
         "target_path": "",
         "output_format": "markdown",
+        "progress": None,
     }
     base.update(overrides)
     return base

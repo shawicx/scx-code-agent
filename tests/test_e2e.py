@@ -21,6 +21,7 @@ class TestE2EAllMode:
             "diff_branch": "",
             "target_path": str(tmp_path),
             "output_format": "markdown",
+            "progress": None,
         }
 
         with patch("agent.nodes.coordinator._scan_directory", return_value=[]):
@@ -29,9 +30,9 @@ class TestE2EAllMode:
         assert "final_report" in result
         assert result["final_report"]  # 非空报告
 
-    @patch("agent.nodes.sec_expert.LLMClient")
-    @patch("agent.nodes.arch_expert.LLMClient")
-    @patch("agent.nodes.perf_expert.LLMClient")
+    @patch("agent.nodes.base_expert.LLMClient")
+    @patch("agent.nodes.base_expert.LLMClient")
+    @patch("agent.nodes.base_expert.LLMClient")
     def test_all_mode_with_code_files(self, mock_perf_llm, mock_arch_llm, mock_sec_llm, sample_py_project):
         """--all 模式完整流程：coordinator 收集文件 -> 专家审查 -> reporter 生成报告"""
         for mock_cls in [mock_sec_llm, mock_arch_llm, mock_perf_llm]:
@@ -57,6 +58,7 @@ class TestE2EAllMode:
             "diff_branch": "",
             "target_path": str(sample_py_project),
             "output_format": "markdown",
+            "progress": None,
         }
 
         with patch("agent.nodes.coordinator._scan_directory") as mock_scan:
@@ -70,9 +72,9 @@ class TestE2EAllMode:
         assert report
         assert "Code Review Report" in report or "Total Issues" in report or "issue" in report.lower()
 
-    @patch("agent.nodes.sec_expert.LLMClient")
-    @patch("agent.nodes.arch_expert.LLMClient")
-    @patch("agent.nodes.perf_expert.LLMClient")
+    @patch("agent.nodes.base_expert.LLMClient")
+    @patch("agent.nodes.base_expert.LLMClient")
+    @patch("agent.nodes.base_expert.LLMClient")
     def test_all_mode_no_issues_found(self, mock_perf_llm, mock_arch_llm, mock_sec_llm):
         """所有专家均未发现问题时应输出无问题报告"""
         for mock_cls in [mock_sec_llm, mock_arch_llm, mock_perf_llm]:
@@ -89,6 +91,7 @@ class TestE2EAllMode:
             "diff_branch": "",
             "target_path": ".",
             "output_format": "markdown",
+            "progress": None,
         }
 
         with patch(
@@ -118,6 +121,7 @@ class TestE2EOutputFormats:
             "diff_branch": "",
             "target_path": ".",
             "output_format": "json",
+            "progress": None,
         }
 
         with patch("agent.nodes.coordinator._scan_directory", return_value=[]):
@@ -139,6 +143,7 @@ class TestE2EOutputFormats:
             "diff_branch": "",
             "target_path": ".",
             "output_format": "markdown",
+            "progress": None,
         }
 
         with patch("agent.nodes.coordinator._scan_directory", return_value=[]):
@@ -151,9 +156,9 @@ class TestE2EOutputFormats:
 class TestE2EDeduplication:
     """E2E tests for issue deduplication across experts."""
 
-    @patch("agent.nodes.sec_expert.LLMClient")
-    @patch("agent.nodes.arch_expert.LLMClient")
-    @patch("agent.nodes.perf_expert.LLMClient")
+    @patch("agent.nodes.base_expert.LLMClient")
+    @patch("agent.nodes.base_expert.LLMClient")
+    @patch("agent.nodes.base_expert.LLMClient")
     def test_cross_expert_deduplication(self, mock_perf_llm, mock_arch_llm, mock_sec_llm):
         """不同专家发现同一位置的同一问题时应去重"""
         duplicate_issue = {
@@ -194,6 +199,7 @@ class TestE2EDeduplication:
             "diff_branch": "",
             "target_path": ".",
             "output_format": "markdown",
+            "progress": None,
         }
 
         with patch(
@@ -218,9 +224,9 @@ class TestE2EDeduplication:
 class TestE2EErrorRecovery:
     """E2E tests for error recovery."""
 
-    @patch("agent.nodes.sec_expert.LLMClient")
-    @patch("agent.nodes.arch_expert.LLMClient")
-    @patch("agent.nodes.perf_expert.LLMClient")
+    @patch("agent.nodes.base_expert.LLMClient")
+    @patch("agent.nodes.base_expert.LLMClient")
+    @patch("agent.nodes.base_expert.LLMClient")
     def test_llm_returns_empty_result(self, mock_perf_llm, mock_arch_llm, mock_sec_llm):
         """LLM 返回空结果时流程应正常完成"""
         for mock_cls in [mock_sec_llm, mock_arch_llm, mock_perf_llm]:
@@ -237,6 +243,7 @@ class TestE2EErrorRecovery:
             "diff_branch": "",
             "target_path": ".",
             "output_format": "markdown",
+            "progress": None,
         }
 
         with patch(
@@ -249,9 +256,9 @@ class TestE2EErrorRecovery:
 
         assert result.get("final_report")
 
-    @patch("agent.nodes.sec_expert.LLMClient")
-    @patch("agent.nodes.arch_expert.LLMClient")
-    @patch("agent.nodes.perf_expert.LLMClient")
+    @patch("agent.nodes.base_expert.LLMClient")
+    @patch("agent.nodes.base_expert.LLMClient")
+    @patch("agent.nodes.base_expert.LLMClient")
     def test_llm_raises_exception(self, mock_perf_llm, mock_arch_llm, mock_sec_llm):
         """某个 LLM 调用抛异常时，其余专家应继续工作"""
         mock_sec = MagicMock()
@@ -284,6 +291,7 @@ class TestE2EErrorRecovery:
             "diff_branch": "",
             "target_path": ".",
             "output_format": "markdown",
+            "progress": None,
         }
 
         with patch(

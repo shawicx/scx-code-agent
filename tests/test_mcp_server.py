@@ -69,12 +69,12 @@ class TestReviewPath:
         mock_client.review_code.return_value = []
 
         with (
-            patch("agent.nodes.sec_expert.LLMClient", return_value=mock_client),
-            patch("agent.nodes.arch_expert.LLMClient", return_value=mock_client),
-            patch("agent.nodes.perf_expert.LLMClient", return_value=mock_client),
-            patch("agent.nodes.sec_expert.load_prompt", return_value=""),
-            patch("agent.nodes.arch_expert.load_prompt", return_value=""),
-            patch("agent.nodes.perf_expert.load_prompt", return_value=""),
+            patch("agent.nodes.base_expert.LLMClient", return_value=mock_client),
+            patch("agent.nodes.base_expert.LLMClient", return_value=mock_client),
+            patch("agent.nodes.base_expert.LLMClient", return_value=mock_client),
+            patch("agent.nodes.base_expert.load_prompt", return_value=""),
+            patch("agent.nodes.base_expert.load_prompt", return_value=""),
+            patch("agent.nodes.base_expert.load_prompt", return_value=""),
         ):
             result = _do_review_path(path=str(tmp_path))
 
@@ -113,12 +113,12 @@ class TestReviewAll:
         mock_client.review_code.return_value = []
 
         with (
-            patch("agent.nodes.sec_expert.LLMClient", return_value=mock_client),
-            patch("agent.nodes.arch_expert.LLMClient", return_value=mock_client),
-            patch("agent.nodes.perf_expert.LLMClient", return_value=mock_client),
-            patch("agent.nodes.sec_expert.load_prompt", return_value=""),
-            patch("agent.nodes.arch_expert.load_prompt", return_value=""),
-            patch("agent.nodes.perf_expert.load_prompt", return_value=""),
+            patch("agent.nodes.base_expert.LLMClient", return_value=mock_client),
+            patch("agent.nodes.base_expert.LLMClient", return_value=mock_client),
+            patch("agent.nodes.base_expert.LLMClient", return_value=mock_client),
+            patch("agent.nodes.base_expert.load_prompt", return_value=""),
+            patch("agent.nodes.base_expert.load_prompt", return_value=""),
+            patch("agent.nodes.base_expert.load_prompt", return_value=""),
         ):
             result = _do_review_all()
 
@@ -137,12 +137,12 @@ class TestRunReview:
         mock_client.review_code.return_value = []
 
         with (
-            patch("agent.nodes.sec_expert.LLMClient", return_value=mock_client),
-            patch("agent.nodes.arch_expert.LLMClient", return_value=mock_client),
-            patch("agent.nodes.perf_expert.LLMClient", return_value=mock_client),
-            patch("agent.nodes.sec_expert.load_prompt", return_value=""),
-            patch("agent.nodes.arch_expert.load_prompt", return_value=""),
-            patch("agent.nodes.perf_expert.load_prompt", return_value=""),
+            patch("agent.nodes.base_expert.LLMClient", return_value=mock_client),
+            patch("agent.nodes.base_expert.LLMClient", return_value=mock_client),
+            patch("agent.nodes.base_expert.LLMClient", return_value=mock_client),
+            patch("agent.nodes.base_expert.load_prompt", return_value=""),
+            patch("agent.nodes.base_expert.load_prompt", return_value=""),
+            patch("agent.nodes.base_expert.load_prompt", return_value=""),
         ):
             result = _run_review(state)
 
